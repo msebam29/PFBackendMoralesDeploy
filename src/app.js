@@ -24,8 +24,8 @@ import swaggerJsdoc from "swagger-jsdoc";
 import swaggerUiExpress from "swagger-ui-express";
 
 const app = express()
-const port = config.PORT || 8080;
-const httpServer = app.listen( port , () => {console.log('Server ON in port:', config.PORT)})
+const port = process.env.PORT || 8080;
+const httpServer = app.listen( port , () => {console.log('Server ON in port:', process.env.PORT)})
 const socketServer = new Server(httpServer);
 const swaggerOptions = {
     definition: {
@@ -45,7 +45,7 @@ app.use(express.Router());
 mongoose.connect(process.env.MONGO_URL)
 app.use(session({
     store: MongoStore.create({
-        mongoUrl: config.MONGO_URL,
+        mongoUrl: process.env.MONGO_URL,
         ttl:3600
     }),
     secret: 'CoderSecret',

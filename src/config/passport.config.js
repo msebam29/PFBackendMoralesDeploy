@@ -12,8 +12,8 @@ import { generateUserErrorInfo } from "../services/errors/info.js";
 const admin = {
     first_name: 'Coder',
     last_name: 'Admin',
-    email: config.ADMIN_EMAIL,
-    password: config.ADMIN_PASSWORD,
+    email: process.env.ADMIN_EMAIL,
+    password: process.env.ADMIN_PASSWORD,
     role: 'admin'
 };
 
@@ -82,8 +82,8 @@ const initializePassport = async () => {
         }
     }));
     passport.use('github', new GitHubStrategy({
-        clientID: config.CLIENT_ID,
-        clientSecret: config.CLIENT_SECRET,
+        clientID: process.env.CLIENT_ID,
+        clientSecret: process.env.CLIENT_SECRET,
         callbackURL:"http://localhost:8080/api/sessions/githubCallback"
     }, async(accessToken, refreshToken, profile, done) => {
         try{

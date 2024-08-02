@@ -7,12 +7,11 @@ import config from "./src/config/config.js";
 
 export const createHash = password => bcrypt.hashSync(password, bcrypt.genSaltSync(10));
 export const isValidPassword = (user, password) => bcrypt.compareSync(password, user.password);
-const __filename = fileURLToPath(import.meta.url) // __filename contiene la ruta del archivo actual.
-const __dirname = dirname(__filename);// __dirname contiene el directorio del archivo actual.
+const __filename = fileURLToPath(import.meta.url) 
+const __dirname = dirname(__filename);
 
 export default __dirname;
 
-//Para jwt , extractor de token en Cookies
 export const cookieExtractor = req => {
     let token;
     if (req && req.cookies) {  
@@ -20,10 +19,6 @@ export const cookieExtractor = req => {
     }
     return token;
 }
-
-// export const bearerTokenExtractor = req => {
-//     return req.headers.authorization.split(' ')[1];
-// }
 
 export const passportCall = (strategy) => {
     return async(req, res, next) => {
@@ -86,14 +81,14 @@ const transport = nodemailer.createTransport({
     service: 'gmail',
     port: 587,
     auth: {
-        user: config.EMAIL_USER,
-        pass: config.EMAIL_PASSWORD
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASSWORD
     }
 });
 
 export const sendEmailToUser = async (email, subject, html) => {
     const result = await transport.sendMail({
-        from: 'Inicio de sesion en Coder App <' + config.EMAIL_USER + '>',
+        from: 'Inicio de sesion en Coder App <' + process.env.EMAIL_USER + '>',
         to: email,
         subject: subject,
         html: html

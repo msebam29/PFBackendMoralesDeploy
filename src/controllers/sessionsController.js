@@ -116,13 +116,13 @@ export const resetPassword = async (req, res, next) => {
             service: 'gmail',
             port: 587,
             auth: {
-                user: config.EMAIL_USER,
-                pass: config.EMAIL_PASSWORD
+                user: process.env.EMAIL_USER,
+                pass: process.env.EMAIL_PASSWORD
             }
         });
         try {
            let result = await transport.sendMail({
-                from:'Coder App - recuperacion de contraseña <' + config.EMAIL_USER + '>',
+                from:'Coder App - recuperacion de contraseña <' + process.env.EMAIL_USER + '>',
                 to: email,
                 subject: "Código de recuperación de tu contraseña",
                 html:`

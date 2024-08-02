@@ -17,7 +17,7 @@ describe('Pruebas unitarias del módulo de carritos', () => {
     };
     let cartId;
     before(async () => {
-        await mongoose.connect(config.MONGO_URL);
+        await mongoose.connect(process.env.MONGO_URL);
         testProduct = await ProductService.addProduct(productMock);
     });
     after(async () => {

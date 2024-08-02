@@ -9,9 +9,9 @@ export let tickets;
 export let resetPasswordCodes;
 export let messages;
 
-switch (config.PERSISTENCE) {
+switch (process.env.PERSISTENCE) {
     case 'MONGO':
-        const connection = mongoose.connect(config.MONGO_URL);
+        const connection = mongoose.connect(process.env.MONGO_URL);
         const {default:CartsMongo} = await import('./managersMongoDb/CartsManagerMongo.js');
         const {default:ProductsMongo} = await import('./managersMongoDb/ProductManagerMongo.js');
         const {default:UsersMongo} = await import('./managersMongoDb/UserManagerMongo.js');

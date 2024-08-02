@@ -16,7 +16,7 @@ describe('Pruebas unitarias del módulo de productos', () => {
     };
     beforeEach(async () => {
         try {
-            await mongoose.connect(config.MONGO_URL, { useNewUrlParser: true, useUnifiedTopology: true });
+            await mongoose.connect(process.env.MONGO_URL, { useNewUrlParser: true, useUnifiedTopology: true });
             testProduct = await productService.addProduct(productMock);
         } catch (error) {
             console.error(error);
