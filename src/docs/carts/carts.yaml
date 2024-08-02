@@ -1,0 +1,357 @@
+paths:
+  /api/carts/:
+    get:
+      summary: Obtine todos los carritos de compra
+      tags:
+        - Carts
+      responses:
+        "200":
+          description: Los carritos fueron obtenidos satisfactoriamente de la base de datos
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#components/schemas/Cart'
+        "500":
+          description: Error interno del servidor, usualmente generado por una query defectuosa o un fallo de conexion en la base de datos
+    post:
+      summary: Crea un carrito
+      tags:
+        - Carts
+      responses:
+        "200":
+          description: El carrito fue creado exitosamente
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#components/schemas/Cart"
+        "500":
+          description: Error interno del servidor, usualmente generado por una query defectuosa o un fallo de conexión con la BD.
+  /api/carts/{cid}/:
+    get:
+      summary: Obtiene un carrito a partir del id
+      tags:
+        - Carts
+      parameters:
+      - name: cid
+        in: path
+        required: true
+        description: ID del carrito a solicitar
+        schema:
+          $type: String
+      responses:
+        "200":
+          description: El carrito fue obtenido satisfactoriamente.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#components/schemas/Cart"
+        "400":
+          description: El ID no tiene el formato de id de Mongo.
+        "404":
+          description: Carrito no encontrado.
+        "500":
+          description: Error interno del servidor, usualmente generado por una query defectuosa o un fallo de conexión con la BD.
+    delete:
+      summary: Borra todos los productos de un carrito a partir del id
+      security:
+        - cookieAuth: []
+      tags:
+        - Carts
+      parameters:
+      - name: cid
+        in: path
+        required: true
+        description: ID del carrito a limpiar
+        schema:
+          $type: String
+      responses:
+        "200":
+          description: Carrito limpiado con éxito
+          content:
+            application/json:
+              schema:
+                $ref: '#components/schemas/Cart'
+        "400":
+          description: El ID no tiene el formato de id de Mongo.
+        "404":
+          description: Producto no encontrado.
+        "500":
+          description: Error interno del servidor, usualmente generado por una query defectuosa o un fallo de conexión con la BD
+  /api/carts/{cid}/product/{pid}/:
+    post:
+      summary: Agrega un producto al carrito
+      description: Este endpoint requiere token JWT para autorización y roles de usuario o premium. En caso de ser premium, el usuario no debe ser dueño del producto.
+      security:
+        - cookieAuth: []
+      tags:
+        - Carts
+      parameters:
+      - name: cid
+        in: path
+        required: true
+        description: ID del carrito a modificar
+        schema:
+          $type: String
+      - name: pid
+        in: path
+        required: true
+        description: ID del producto a agregar
+        schema:
+          $type: String
+      responses:
+        "200":
+          description: Producto agregado con éxito
+          content:
+            application/json:
+              schema:
+                $ref: '#components/schemas/Cart'
+        "400":
+          description: Alguno de los ID no tiene el formato de id de Mongo.
+        "404":
+          description: Producto o carrito no encontrado.
+        "500":
+          description: Error interno del servidor, usualmente generado por una query defectuosa o un fallo de conexión con la BD
+    put:
+      summary: Modificar la cantidad de un producto en el carrito
+      security:
+        - cookieAuth: []
+      tags: 
+        - Carts
+      description: Esta ruta permite modificar la cantidad de un producto específico en un carrito específico.
+      parameters:
+        - name: cid
+          in: path
+          description: ID del carrito
+          required: true
+          schema:
+            type: string
+        - name: pid
+          in: path
+          description: ID del producto
+          required: true
+          schema:
+            type: string
+        - name: quantity
+          in: body
+          description: Cantidad del producto a modificar
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Cantidad del producto modificada con éxito
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  deletedToCart:
+                    type: integer
+        '400':
+          description: Error al modificar la cantidad del producto
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+        '404':
+          description: Carrito o producto no encontrado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+    delete:
+      summary: Elimina un producto del carrito
+      security:
+        - cookieAuth: []
+      tags:
+        - Carts
+      parameters:
+      - name: cid
+        in: path
+        required: true
+        description: ID del carrito a modificar
+        schema:
+          $type: String
+      - name: pid
+        in: path
+        required: true
+        description: ID del producto a borrar
+        schema:
+          $type: String
+      responses:
+        "200":
+          description: Producto eliminado con éxito
+          content:
+            application/json:
+              schema:
+                $ref: '#components/schemas/Cart'
+        "400":
+          description: Alguno de los ID no tiene el formato de id de Mongo.
+        "404":
+          description: Producto o carrito no encontrado.
+        "500":
+          description: Error interno del servidor, usualmente generado por una query defectuosa o un fallo de conexión con la BD
+  /api/carts/{cid}/purchase/:
+    get:
+      summary: Genera la orden de compra
+      description: Este endpoint requiere token JWT para autorización y roles de usuario o premium.
+      security:
+        - cookieAuth: []
+      tags:
+        - Carts
+      parameters:
+      - name: cid
+        in: path
+        required: true
+        description: ID del carrito a comprar
+        schema:
+          $type: String
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: "success"
+                  payload:
+                    type: object
+                    properties:
+                      ticket:
+                        type: object
+                        properties:
+                          amount:
+                            type: integer
+                            example: 1000
+                          purchaser:
+                            type: string
+                            example: "norber@bobinajes.com"
+                          _id:
+                            type: string
+                            example: "6596a7568b3b4c9f65e2b66c"
+                          code:
+                            type: string
+                            example: "05cf54bb-50e9-4765-a1e6-3d91a7a962d8"
+                          purchase_datetime:
+                            type: string
+                            format: date-time
+                            example: "2024-01-04T12:40:54.285Z"
+                          __v:
+                            type: integer
+                            example: 0
+                      productosProcesados:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            productID:
+                              type: string
+                              example: "6591e0e491ba05b8a488cd68"
+                            quantity:
+                              type: integer
+                              example: 1
+                            _id:
+                              type: string
+                              example: "6596a65530935ddeff3fda40"
+                      productosNoProcesados:
+                        type: array
+                        items: {}
+        "400":
+          description: Error.
+        "500":
+          description: Error interno del servidor, usualmente generado por una query defectuosa o un fallo de conexión con la BD
+components:
+  securitySchemes:
+    cookieAuth:     # Tu esquema de seguridad
+      type: apiKey
+      in: cookie
+      name: coderCookie
+  schemas:
+    Cart:
+      type: object
+      properties:
+        _id:
+          type: ObjectId
+          description: ID autogenerado de mongo
+        products:
+          $ref: '#/components/schemas/CartProducts'
+      example:
+        _id: ObjectId("654024a6d24c0072b01fb159")
+        products: [{
+                "productID": "64f650a1fe5c0b9e6ec4c426",
+                "quantity": 2
+            },
+            {
+                "productID": "64f650b5fe5c0b9e6ec4c428",
+                "quantity": 11
+            }]
+    CartProducts:
+      type: array
+      items:
+        type: object
+        properties:
+          productID:
+            type: ObjectId
+            description: ID autogenerado de mongo
+          quantity:
+            type: integer
+            description: Unidades del producto en el carrito.
+    Ticket:
+      type: object
+      properties:
+        _id:
+          type: ObjectId
+          description: ID autogenerado de mongo
+        code:
+          type: string
+          description: Código de la orden
+        purchase_datetime:
+          type: string
+          description: Fecha de realización de la orden
+        amount:
+          type: number
+          description: Monto de la orden
+        purchaser:
+          type: string
+          description: email del comprador
+      example:
+        code: 'ORDER17013722750762162'
+        amount: 54.959999999999994
+        purchaser: 'juan@test.com'
+        _id: new ObjectId("6568e173b6116d550105e0bc")
+        purchase_datetime: 2023-11-30T19:24:35.078Z
+    requestBodies:
+      updateCart:
+        type: object
+        properties:
+          products:
+            $ref: '#/components/schemas/CartProducts'
+        example:
+          products: [
+              {
+                  "productID": "64f650b5fe5c0b9e6ec4c428",
+                  "quantity": 2
+              },
+              {
+                  "productID": "64f6508cfe5c0b9e6ec4c424",
+                  "quantity": 1
+              }
+          ]
+      
